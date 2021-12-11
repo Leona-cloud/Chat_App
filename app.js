@@ -4,7 +4,7 @@ const http = require('http');
 const container = require('./container');
 
 
-container.resolve((users)=>{
+container.resolve(function(users){
 
     const app = setupExpress();
 
