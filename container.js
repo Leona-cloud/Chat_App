@@ -7,15 +7,15 @@ const myDependencies = [
     ['_', 'lodash']
 ];
 
-myDependencies.forEach((val)=>{
-    container.register(val[0], ()=>{
-        return require(val[1])
+myDependencies.forEach(function(val){
+    container.register(val[0], function(){
+        return require(val[1]);
     })
 });
 
 container.load(path.join( __dirname, '/controllers'))
 
-container.register('container',()=>{
+container.register('container',function(){
     return container;
 });
 
