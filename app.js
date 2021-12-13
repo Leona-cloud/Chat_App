@@ -3,39 +3,40 @@ const ejs = require("ejs");
 const http = require("http");
 const container = require("./container");
 const cookieParser = require("cookie-parser");
-
+require('dotenv').config();
 const session = require("express-session");
 const mongoose = require("mongoose");
 const flash = require("connect-flash");
 const MongoStore = require("connect-mongo");
-const passport = require('passport')
+const passport = require('passport');
+
 
 
 container.resolve(function (users) {
   mongoose.Promise = global.Promise;
-  mongoose.connect("mongodb://localhost/notes", {
+  mongoose.connect(process.env.DB_CONNECT, {
     useNewUrlParser: true,
-    useUnifiedTopology: true,
-  }).then(()=> console.log(`connected to `))
+    useUnifiedTopology: true
+  }).then(()=> console.log(`connected to chat`))
   .catch((err)=>{console.log(err)});
 
   const app = setupExpress();
 
-  function setupExpress() {
-    const app = express();
+  function setupExpress(){
+    let app = express();
     const server = http.createServer(app);
     server.listen(3000, () => {
       console.log("listening on port 3000");
     });
 
-    configureExpress(app);
+     configureExpress(app);
 
-    //setup router
     const router = require("express-promise-router")();
     users.setRoute(router);
+    
+        app.use(router);
 
-    app.use(router);
-  }
+  };
 
   function configureExpress(app) {
     app.use(express.static("public"));
@@ -47,10 +48,10 @@ container.resolve(function (users) {
    
     app.use(
       session({
-        secret: "mySecretKey",
+        secret: process.env.KEY,
         resave: true,
         saveUninitialized: false,
-        store: MongoStore.create({ mongoUrl: mongoose.connection}),
+        store: MongoStore.create({ mongoUrl: process.env.DB_CONNECT }),
       })
     );
 
@@ -59,5 +60,11 @@ container.resolve(function (users) {
     app.use(passport.initialize());
     app.use(passport.session())
   }
+
+ 
+
+
+
 });
+
 
