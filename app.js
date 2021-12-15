@@ -2,6 +2,7 @@ const express = require("express");
 const ejs = require("ejs");
 const http = require("http");
 const container = require("./container");
+const validator = require ('express-validator');
 const cookieParser = require("cookie-parser");
 require('dotenv').config();
 const session = require("express-session");
@@ -25,8 +26,9 @@ container.resolve(function (users) {
   function setupExpress(){
     let app = express();
     const server = http.createServer(app);
-    server.listen(3000, () => {
-      console.log("listening on port 3000");
+    const port = process.env.PORT || 3000;
+    server.listen(port, () => {
+      console.log(`listening on port ${port} `);
     });
 
      configureExpress(app);
@@ -39,12 +41,16 @@ container.resolve(function (users) {
   };
 
   function configureExpress(app) {
+    require('./passport/passport-local');
+
+
     app.use(express.static("public"));
     app.use(cookieParser());
     app.set("view engine", "ejs");
     app.use(express.json());
     app.use(express.urlencoded({ extended: true }));
 
+    app.use(validator());
    
     app.use(
       session({
@@ -63,8 +69,7 @@ container.resolve(function (users) {
 
  
 
-
+  //setup router
 
 });
-
 
